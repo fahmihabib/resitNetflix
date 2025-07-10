@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <title>Resit Bayaran Netflix</title>
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      background: #f0f0f0;
+      padding: 20px;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+    }
+
+    label, input, select {
+      display: block;
+      margin-top: 10px;
+      width: 100%;
+      font-family: sans-serif;
+      font-size: 16px;
+    }
+
+    input, select {
+      padding: 8px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #e50914;
+      color: white;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .resit {
+      border: 2px solid #000;
+      padding: 20px;
+      margin-top: 30px;
+      background: white;
+      width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+    }
+
+    .resit img {
+      width: 100px;
+      margin-bottom: 10px;
+    }
+
+    .line {
+      font-family: 'Courier New', monospace;
+      font-size: 16px;
+      text-align: center;
+      white-space: pre;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 30px;
+      border-collapse: collapse;
+      font-family: sans-serif;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+
+      .resit, .resit * {
+        visibility: visible;
+      }
+
+      .resit {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <label>Nama</label>
+    <input type="text" id="nama">
+
+    <label>Jumlah Bayaran (RM)</label>
+    <input type="number" id="jumlah">
+
+    <label>Bulan</label>
+    <select id="bulan">
+      <option>Januari</option><option>Februari</option><option>Mac</option>
+      <option>April</option><option>Mei</option><option>Jun</option>
+      <option>Julai</option><option>Ogos</option><option>September</option>
+      <option>Oktober</option><option>November</option><option>Disember</option>
+    </select>
+
+    <label>Status</label>
+    <select id="status">
+      <option>Berjaya</option><option>Tidak Berjaya</option><option>Tertunggak</option>
+    </select>
+
+    <button onclick="simpanData()">Simpan & Cetak</button>
+
+    <div class="resit" id="resit" style="display:none;">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" alt="Netflix Logo"><br>
+      <div class="line">+----------------------------------------+</div>
+      <div class="line">|              RESIT BAYARAN            |</div>
+      <div class="line">|         LANGGANAN NETFLIX BULANAN     |</div>
+      <div class="line">|     COMPANY : AKUPLAYKAUPAUSE SDN BHD |</div>
+      <div class="line">+----------------------------------------+</div>
+      <div class="line" id="tarikhLine"></div>
+      <div class="line" id="masaLine"></div>
+      <div class="line" id="namaLine"></div>
+      <div class="line" id="bulanLine"></div>
+      <div class="line" id="jumlahLine"></div>
+      <div class="line" id="statusLine"></div>
+      <div class="line">+----------------------------------------+</div>
+      <div class="line" id="thank1"></div>
+      <div class="line" id="thank2"></div>
+      <div class="line" id="footer"></div>
+      <div class="line">+----------------------------------------+</div>
+    </div>
+
+    <table id="rekodTable">
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>Bulan</th>
+          <th>Jumlah</th>
+          <th>Status</th>
+          <th>Tarikh</th>
+          <th>Tindakan</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    let rekod = [];
+
+    function simpanData() {
+      const nama = document.getElementById('nama').value.trim();
+      const jumlah = parseFloat(document.getElementById('jumlah').value || 0).toFixed(2);
+      const bulan = document.getElementById('bulan').value;
+      const status = document.getElementById('status').value;
+
+      if (!nama || !jumlah || !bulan || !status) {
+        alert("Sila isi semua maklumat.");
+        return;
+      }
+
+      const now = new Date();
+      const tarikh = now.toLocaleDateString("ms-MY");
+      const masa = now.toLocaleTimeString("ms-MY");
+
+      const resit = { nama, jumlah, bulan, status, tarikh, masa };
+      rekod.push(resit);
+      updateTable();
+      paparResit(resit);
+    }
+
+    function updateTable() {
+      const tbody = document.querySelector("#rekodTable tbody");
+      tbody.innerHTML = "";
+
+      rekod.forEach((r, i) => {
+        const row = `
+          <tr>
+            <td>${r.nama}</td>
+            <td>${r.bulan}</td>
+            <td>RM ${r.jumlah}</td>
+            <td>${r.status}</td>
+            <td>${r.tarikh}</td>
+            <td>
+              <button onclick="editRekod(${i})">Edit</button>
+              <button onclick="padamRekod(${i})">Padam</button>
+              <button onclick="paparResit(rekod[${i}])">Cetak</button>
+            </td>
+          </tr>
+        `;
+        tbody.innerHTML += row;
+      });
+    }
+
+    function pad(str) {
+      return str.padEnd(40, ' ');
+    }
+
+    function centerText(str) {
+      const total = 40;
+      const padLeft = Math.floor((total - str.length) / 2);
+      const padRight = total - str.length - padLeft;
+      return ' '.repeat(padLeft) + str + ' '.repeat(padRight);
+    }
+
+    function paparResit(r) {
+      document.getElementById("tarikhLine").textContent = pad("Tarikh : " + r.tarikh);
+      document.getElementById("masaLine").textContent   = pad("Masa   : " + r.masa);
+      document.getElementById("namaLine").textContent   = pad("Nama   : " + r.nama);
+      document.getElementById("bulanLine").textContent  = pad("Bulan  : " + r.bulan);
+      document.getElementById("jumlahLine").textContent = pad("Amaun  : RM " + r.jumlah);
+      document.getElementById("statusLine").textContent = pad("Status : " + r.status);
+
+      document.getElementById("thank1").textContent = centerText("Terima kasih atas bayaran anda.");
+      document.getElementById("thank2").textContent = centerText("Simpan resit ini sebagai bukti.");
+      document.getElementById("footer").textContent  = centerText("-- Sistem Netflix Habib --");
+
+      document.getElementById("resit").style.display = "block";
+      setTimeout(() => window.print(), 300);
+    }
+
+    function editRekod(index) {
+      const r = rekod[index];
+      document.getElementById("nama").value = r.nama;
+      document.getElementById("jumlah").value = r.jumlah;
+      document.getElementById("bulan").value = r.bulan;
+      document.getElementById("status").value = r.status;
+      rekod.splice(index, 1);
+      updateTable();
+    }
+
+    function padamRekod(index) {
+      if (confirm("Padam resit ini?")) {
+        rekod.splice(index, 1);
+        updateTable();
+      }
+    }
+  </script>
+</body>
+</html>
