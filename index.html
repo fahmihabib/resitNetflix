@@ -1,250 +1,240 @@
 <!DOCTYPE html>
-<html lang="ms">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Resit Bayaran Netflix</title>
+  <title>Netflix Invoice Generator - Habib Tech VisionPlay</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
   <style>
     body {
       font-family: 'Courier New', monospace;
-      background: #f0f0f0;
-      padding: 20px;
+      background: #f4f4f4;
       margin: 0;
+      padding: 20px;
     }
-
     .container {
-      max-width: 800px;
+      max-width: 900px;
       margin: auto;
-      background: #fff;
-      padding: 30px;
-      border-radius: 10px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
     }
-
-    label, input, select {
-      display: block;
-      margin-top: 10px;
-      width: 100%;
-      font-family: sans-serif;
-      font-size: 16px;
+    h2 {
+      text-align: center;
+      color: #333;
     }
-
+    .form-group {
+      margin-bottom: 12px;
+    }
+    label {
+      font-weight: bold;
+    }
     input, select {
+      width: 100%;
       padding: 8px;
+      margin-top: 4px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
     }
-
     button {
-      margin-top: 20px;
       padding: 10px 20px;
-      background: #e50914;
-      color: white;
+      margin-top: 15px;
       border: none;
-      font-size: 16px;
+      border-radius: 6px;
+      background: #2c3e50;
+      color: white;
       cursor: pointer;
     }
-
-    .resit {
-      border: 2px solid #000;
-      padding: 20px;
-      margin-top: 30px;
-      background: white;
-      width: 400px;
-      margin-left: auto;
-      margin-right: auto;
-      text-align: center;
+    button:hover {
+      background: #1a252f;
     }
-
-    .resit img {
-      width: 100px;
+    .invoice {
+      margin-top: 30px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      background: #fff;
+      position: relative;
+      font-family: 'Courier New', monospace;
+    }
+    .invoice-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .invoice-body {
+      margin-top: 20px;
+    }
+    .invoice-footer {
+      margin-top: 30px;
+      text-align: center;
+      font-style: italic;
+      color: #555;
+    }
+    hr {
+      border: 0;
+      border-top: 1px solid #ccc;
+    }
+    .netflix-logo {
+      height: 40px;
       margin-bottom: 10px;
     }
-
-    .line {
-      font-family: 'Courier New', monospace;
-      font-size: 16px;
-      text-align: center;
-      white-space: pre;
-    }
-
-    table {
-      width: 100%;
-      margin-top: 30px;
-      border-collapse: collapse;
-      font-family: sans-serif;
-    }
-
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
+    .company-info {
+      margin-top: 5px;
       font-size: 14px;
-      text-align: center;
+      line-height: 1.4;
     }
-
-    @media print {
-      body * {
-        visibility: hidden;
-      }
-
-      .resit, .resit * {
-        visibility: visible;
-      }
-
-      .resit {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        margin: auto;
-      }
+    .company-quote {
+      margin-top: 8px;
+      font-style: italic;
+      color: #666;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <label>Nama</label>
-    <input type="text" id="nama">
-
-    <label>Jumlah Bayaran (RM)</label>
-    <input type="number" id="jumlah">
-
-    <label>Bulan</label>
-    <select id="bulan">
-      <option>Januari</option><option>Februari</option><option>Mac</option>
-      <option>April</option><option>Mei</option><option>Jun</option>
-      <option>Julai</option><option>Ogos</option><option>September</option>
-      <option>Oktober</option><option>November</option><option>Disember</option>
-    </select>
-
-    <label>Status</label>
-    <select id="status">
-      <option>Berjaya</option><option>Tidak Berjaya</option><option>Tertunggak</option>
-    </select>
-
-    <button onclick="simpanData()">Simpan & Cetak</button>
-
-    <div class="resit" id="resit" style="display:none;">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" alt="Netflix Logo"><br>
-      <div class="line">+----------------------------------------+</div>
-      <div class="line">|              RESIT BAYARAN            |</div>
-      <div class="line">|         LANGGANAN NETFLIX BULANAN     |</div>
-      <div class="line">|     COMPANY : AKUPLAYKAUPAUSE SDN BHD |</div>
-      <div class="line">+----------------------------------------+</div>
-      <div class="line" id="tarikhLine"></div>
-      <div class="line" id="masaLine"></div>
-      <div class="line" id="namaLine"></div>
-      <div class="line" id="bulanLine"></div>
-      <div class="line" id="jumlahLine"></div>
-      <div class="line" id="statusLine"></div>
-      <div class="line">+----------------------------------------+</div>
-      <div class="line" id="thank1"></div>
-      <div class="line" id="thank2"></div>
-      <div class="line" id="footer"></div>
-      <div class="line">+----------------------------------------+</div>
+    <h2>Netflix Invoice Generator - Habib Tech VisionPlay</h2>
+    <div class="form-group">
+      <label>Invoice Number</label>
+      <input type="text" id="invoiceNumber" readonly>
     </div>
+    <div class="form-group">
+      <label>Invoice Date</label>
+      <input type="date" id="invoiceDate">
+    </div>
+    <div class="form-group">
+      <label>Member Name</label>
+      <input type="text" id="memberName">
+    </div>
+    <div class="form-group">
+      <label>Profile Used</label>
+      <select id="profileUsed">
+        <option value="(Netflix01)_akuplaykaupause@gmail.com">(Netflix01)_akuplaykaupause@gmail.com</option>
+        <option value="(Netflix02)_mhrswitch2021@gmail.com">(Netflix02)_mhrswitch2021@gmail.com</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Payment For Month</label>
+      <select id="paymentMonth">
+        <option value="January">January</option>
+        <option value="February">February</option>
+        <option value="March">March</option>
+        <option value="April">April</option>
+        <option value="May">May</option>
+        <option value="June">June</option>
+        <option value="July">July</option>
+        <option value="August">August</option>
+        <option value="September">September</option>
+        <option value="October">October</option>
+        <option value="November">November</option>
+        <option value="December">December</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Amount (RM)</label>
+      <input type="number" id="amount" placeholder="e.g. 17">
+    </div>
+    <div class="form-group">
+      <label>Payment Status</label>
+      <select id="status">
+        <option>Successful</option>
+        <option>Declined</option>
+        <option>Pending</option>
+        <option>Waived</option>
+      </select>
+    </div>
+    <button onclick="generateInvoice()">Generate Invoice</button>
+    <button onclick="downloadPDF()">Download Last Invoice as PDF</button>
 
-    <table id="rekodTable">
-      <thead>
-        <tr>
-          <th>Nama</th>
-          <th>Bulan</th>
-          <th>Jumlah</th>
-          <th>Status</th>
-          <th>Tarikh</th>
-          <th>Tindakan</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <div id="invoiceContainer"></div>
   </div>
 
   <script>
-    let rekod = [];
-
-    function simpanData() {
-      const nama = document.getElementById('nama').value.trim();
-      const jumlah = parseFloat(document.getElementById('jumlah').value || 0).toFixed(2);
-      const bulan = document.getElementById('bulan').value;
-      const status = document.getElementById('status').value;
-
-      if (!nama || !jumlah || !bulan || !status) {
-        alert("Sila isi semua maklumat.");
-        return;
-      }
-
+    function generateInvoice() {
       const now = new Date();
-      const tarikh = now.toLocaleDateString("ms-MY");
-      const masa = now.toLocaleTimeString("ms-MY");
+      const autoNumber = `INV${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}`;
+      const dateStr = document.getElementById("invoiceDate").value || now.toISOString().split("T")[0];
 
-      const resit = { nama, jumlah, bulan, status, tarikh, masa };
-      rekod.push(resit);
-      updateTable();
-      paparResit(resit);
+      const member = document.getElementById("memberName").value;
+      const profile = document.getElementById("profileUsed").value;
+      const month = document.getElementById("paymentMonth").value;
+      const amount = document.getElementById("amount").value;
+      const status = document.getElementById("status").value;
+
+      const container = document.getElementById("invoiceContainer");
+
+      const invoiceHTML = `
+        <div class="invoice" id="invoice-${autoNumber}">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" class="netflix-logo" alt="Netflix Logo">
+          <div class="invoice-header">
+            <div>
+              <h3>Habib Tech VisionPlay</h3>
+              <div class="company-info">
+                <strong>Phone:</strong> 013-8987810<br>
+                <strong>Email:</strong> akuplaykaupause@gmail.com<br>
+                <strong>Address:</strong><br>
+                8427 Kingsvale Circle<br>
+                Eastbrooke, CA 90234<br>
+                United States
+              </div>
+              <div class="company-quote">
+                "Your Official Gateway to Premium Streaming"
+              </div>
+            </div>
+            <div>
+              Invoice #: ${autoNumber}<br>
+              Date: ${dateStr}
+            </div>
+          </div>
+          <hr>
+          <div class="invoice-body">
+            <p><strong>Bill To:</strong><br>
+            Name: ${member}<br>
+            Profile: ${profile}</p>
+
+            <p><strong>Description:</strong><br>
+            Netflix Monthly Subscription (${month})<br>
+            Package: 30 Days of Netflix 4K HDR</p>
+
+            <p><strong>Amount:</strong> RM${amount}</p>
+            <p><strong>Status:</strong> ${status}</p>
+          </div>
+          <div class="invoice-footer">
+            Thank you for your payment!
+          </div>
+
+          <br><br>
+          <button onclick="printSpecificInvoice('invoice-${autoNumber}')">Print This Invoice</button>
+        </div>
+      `;
+
+      container.innerHTML = invoiceHTML;
     }
 
-    function updateTable() {
-      const tbody = document.querySelector("#rekodTable tbody");
-      tbody.innerHTML = "";
-
-      rekod.forEach((r, i) => {
-        const row = `
-          <tr>
-            <td>${r.nama}</td>
-            <td>${r.bulan}</td>
-            <td>RM ${r.jumlah}</td>
-            <td>${r.status}</td>
-            <td>${r.tarikh}</td>
-            <td>
-              <button onclick="editRekod(${i})">Edit</button>
-              <button onclick="padamRekod(${i})">Padam</button>
-              <button onclick="paparResit(rekod[${i}])">Cetak</button>
-            </td>
-          </tr>
-        `;
-        tbody.innerHTML += row;
-      });
+    function printSpecificInvoice(invoiceId) {
+      const original = document.body.innerHTML;
+      const content = document.getElementById(invoiceId).outerHTML;
+      document.body.innerHTML = content;
+      window.print();
+      document.body.innerHTML = original;
+      location.reload();
     }
 
-    function pad(str) {
-      return str.padEnd(40, ' ');
-    }
-
-    function centerText(str) {
-      const total = 40;
-      const padLeft = Math.floor((total - str.length) / 2);
-      const padRight = total - str.length - padLeft;
-      return ' '.repeat(padLeft) + str + ' '.repeat(padRight);
-    }
-
-    function paparResit(r) {
-      document.getElementById("tarikhLine").textContent = pad("Tarikh : " + r.tarikh);
-      document.getElementById("masaLine").textContent   = pad("Masa   : " + r.masa);
-      document.getElementById("namaLine").textContent   = pad("Nama   : " + r.nama);
-      document.getElementById("bulanLine").textContent  = pad("Bulan  : " + r.bulan);
-      document.getElementById("jumlahLine").textContent = pad("Amaun  : RM " + r.jumlah);
-      document.getElementById("statusLine").textContent = pad("Status : " + r.status);
-
-      document.getElementById("thank1").textContent = centerText("Terima kasih atas bayaran anda.");
-      document.getElementById("thank2").textContent = centerText("Simpan resit ini sebagai bukti.");
-      document.getElementById("footer").textContent  = centerText("-- Sistem Netflix Habib --");
-
-      document.getElementById("resit").style.display = "block";
-      setTimeout(() => window.print(), 300);
-    }
-
-    function editRekod(index) {
-      const r = rekod[index];
-      document.getElementById("nama").value = r.nama;
-      document.getElementById("jumlah").value = r.jumlah;
-      document.getElementById("bulan").value = r.bulan;
-      document.getElementById("status").value = r.status;
-      rekod.splice(index, 1);
-      updateTable();
-    }
-
-    function padamRekod(index) {
-      if (confirm("Padam resit ini?")) {
-        rekod.splice(index, 1);
-        updateTable();
+    function downloadPDF() {
+      const invoiceDiv = document.querySelector(".invoice");
+      if (invoiceDiv) {
+        html2pdf().from(invoiceDiv).save("Netflix-Invoice.pdf");
+      } else {
+        alert("No invoice to download. Please generate one first.");
       }
     }
+
+    window.onload = () => {
+      const now = new Date();
+      const autoNumber = `INV${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}`;
+      document.getElementById("invoiceNumber").value = autoNumber;
+      document.getElementById("invoiceDate").valueAsDate = now;
+    };
   </script>
 </body>
 </html>
